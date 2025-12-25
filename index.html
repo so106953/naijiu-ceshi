@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UL60730 测试时间计算器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+```
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 10px;
+    }
+
+    .container {
+        max-width: 900px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        overflow: hidden;
+    }
+
+    .header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 25px 20px;
+        color: white;
+        text-align: center;
+    }
+
+    .header h1 {
+        font-size: 28px;
+        margin-bottom: 8px;
+    }
+
+    .header p {
+        font-size: 14px;
+        opacity: 0.9;
+    }
+
+    .content {
+        padding: 25px 20px;
+    }
+
+    .warning-box {
+        background: #fef3c7;
+        border: 2px solid #f59e0b;
+        border-radius: 12px;
+        padding: 18px;
+        margin-bottom: 25px;
+    }
+
+    .warning-box h3 {
+        color: #92400e;
+        margin-bottom: 12px;
+        font-size: 16px;
+    }
+
+    .warning-box p {
+        color: #78350f;
+        font-size: 13px;
+        margin: 6px 0;
+        line-height: 1.5;
+    }
+
+    .section {
+        background: #f9fafb;
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+
+    .section h2 {
+        color: #374151;
+        margin-bottom: 18px;
+        font-size: 18px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .input-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    @media (min-width: 768px) {
+        .input-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+
+    .input-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .input-group label {
+        color: #374151;
+        font-weight: 600;
+        margin-bottom: 6px;
+        font-size: 14px;
+    }
+
+    .input-group input {
+        padding: 14px;
+        border: 2px solid #d1d5db;
+        border-radius: 8px;
+        font-size: 18px;
+        font-weight: 600;
+        text-align: center;
+    }
+
+    .input-group input:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .hint {
+        font-size: 12px;
+        color: #6b7280;
+        margin-top: 4px;
+        text-align: center;
+    }
+
+    .btn {
+        width: 100%;
+        padding: 18px;
+        border: none;
+        border-radius: 12px;
+        font-size: 18px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s;
+        background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%);
+        color: white;
+        margin-top: 20px;
+    }
+
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(236, 72, 153, 0.4);
+    }
+
+    .result-box {
+        margin-top: 25px;
+        display: none;
+    }
+
+    .result-box.show {
+        display: block;
+    }
+
+    .result-title {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 20px;
+        text-align: center;
+        color: #667eea;
+    }
+
+    .summary-cards {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+
+    @media (min-width: 768px) {
+        .summary-cards {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+
+    .summary-card {
+        background: white;
+        padding: 15px;
+        border-radius: 10px;
+        text-align: center;
+        border: 2px solid #e5e7eb;
+    }
+
+    .summary-card h4 {
+        color: #6b7280;
+        font-size: 12px;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+    }
+
+    .summary-card .value {
+        font-size: 28px;
+        font-weight: bold;
+        color: #1f2937;
+    }
+
+    .summary-card .unit {
+        font-size: 14px;
+        color: #6b7280;
+        margin-top: 2px;
+    }
+
+    .big-highlight {
+        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+        padding: 25px;
+        border-radius: 12px;
+        text-align: center;
+        margin: 20px 0;
+        border: 2px solid #f59e0b;
+    }
+
+    .big-highlight h3 {
+        color: #92400e;
+        font-size: 14px;
+        margin-bottom: 10px;
+    }
+
+    .big-highlight .value {
+        font-size: 42px;
+        font-weight: bold;
+        color: #d97706;
+    }
+
+    .completion-box {
+        background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+        border: 2px solid #10b981;
+        border-radius: 12px;
+        padding: 20px;
+        text-align: center;
+        margin: 20px 0;
+    }
+
+    .completion-box h3 {
+        color: #065f46;
+        font-size: 14px;
+        margin-bottom: 8px;
+    }
+
+    .completion-box .time {
+        font-size: 32px;
+        font-weight: bold;
+        color: #059669;
+    }
+
+    .completion-box .note {
+        color: #047857;
+        font-size: 12px;
+        margin-top: 5px;
+    }
+
+    .result-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 15px;
+        margin: 20px 0;
+    }
+
+    @media (min-width: 768px) {
+        .result-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    .result-card {
+        background: white;
+        padding: 18px;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .result-card h4 {
+        color: #6b7280;
+        font-size: 13px;
+        margin-bottom: 8px;
+    }
+
+    .result-card .value {
+        font-size: 32px;
+        font-weight: bold;
+        color: #1f2937;
+    }
+
+    .result-card .unit {
+        font-size: 14px;
+        color: #6b7280;
+    }
+
+    .result-card .detail {
+        font-size: 12px;
+        color: #9ca3af;
+        margin-top: 8px;
+        line-height: 1.4;
+    }
+
+    .on-card {
+        border-left: 4px solid #10b981;
+        background: linear-gradient(to right, #d1fae5, white);
+    }
+
+    .on-card .value {
+        color: #059669;
+    }
+
+    .off-card {
+        border-left: 4px solid #f59e0b;
+        background: linear-gradient(to right, #fed7aa, white);
+    }
+
+    .off-card .value {
+        color: #d97706;
+    }
+
+    .info-section {
+        background: #dbeafe;
+        border-left: 4px solid #3b82f6;
+        padding: 18px;
+        border-radius: 8px;
+        margin-top: 20px;
+    }
+
+    .info-section h4 {
+        color: #1e40af;
+        margin-bottom: 12px;
+        font-size: 15px;
+    }
+
+    .info-section p {
+        color: #1e40af;
+        font-size: 13px;
+        margin: 6px 0;
+        line-height: 1.6;
+    }
+
+    .frequency-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin: 20px 0;
+    }
+
+    .frequency-card {
+        background: white;
+        padding: 15px;
+        border-radius: 8px;
+        text-align: center;
+        border: 2px solid #e5e7eb;
+    }
+
+    .frequency-card h4 {
+        color: #6b7280;
+        font-size: 11px;
+        margin-bottom: 8px;
+    }
+
+    .frequency-card .value {
+        font-size: 24px;
+        font-weight: bold;
+        color: #667eea;
+    }
+
+    .frequency-card .unit {
+        font-size: 12px;
+        color: #6b7280;
+    }
+</style>
+```
+
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⏰ UL60730 测试时间计算器</h1>
+            <p>快速计算测试总时长和完成时间</p>
+        </div>
+
+```
+    <div class="content">
+        <!-- 说明 -->
+        <div class="warning-box">
+            <h3>📋 UL60730 耐久测试说明</h3>
+            <p>• <strong>ON时间（通电）：</strong>设备通电运行的时间</p>
+            <p>• <strong>OFF时间（断电）：</strong>设备断电停止的时间</p>
+            <p>• <strong>完整循环：</strong>ON时间 + OFF时间（例如：1秒 + 9秒 = 10秒）</p>
+            <p>• <strong>测试目的：</strong>验证开关、继电器等电气部件的通断耐久性</p>
+        </div>
+
+        <!-- 测试参数输入 -->
+        <div class="section">
+            <h2>⚙️ 测试参数设置</h2>
+            <div class="input-grid">
+                <div class="input-group">
+                    <label>ON时间（通电）</label>
+                    <input type="number" id="onTime" value="1.0" step="0.1">
+                    <span class="hint">秒</span>
+                </div>
+                <div class="input-group">
+                    <label>OFF时间（断电）</label>
+                    <input type="number" id="offTime" value="9.0" step="0.1">
+                    <span class="hint">秒</span>
+                </div>
+                <div class="input-group">
+                    <label>测试总次数</label>
+                    <input type="number" id="totalCycles" value="10000" step="1">
+                    <span class="hint">次</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 计算按钮 -->
+        <button class="btn" onclick="calculateTime()">
+            🚀 开始计算
+        </button>
+
+        <!-- 计算结果 -->
+        <div id="result" class="result-box"></div>
+    </div>
+</div>
+
+<script>
+    function calculateTime() {
+        const tOn = parseFloat(document.getElementById('onTime').value);
+        const tOff = parseFloat(document.getElementById('offTime').value);
+        const cycles = parseInt(document.getElementById('totalCycles').value);
+
+        if (!tOn || !tOff || !cycles) {
+            alert('请输入所有参数');
+            return;
+        }
+
+        if (tOn <= 0 || tOff <= 0 || cycles <= 0) {
+            alert('所有参数必须大于0');
+            return;
+        }
+
+        // 计算
+        const cycleTotalTime = tOn + tOff;
+        const totalTestTimeSeconds = cycleTotalTime * cycles;
+        const totalTestTimeMinutes = totalTestTimeSeconds / 60;
+        const totalTestTimeHours = totalTestTimeMinutes / 60;
+        const totalTestTimeDays = totalTestTimeHours / 24;
+
+        const totalOnTime = tOn * cycles;
+        const totalOffTime = tOff * cycles;
+        const totalOnHours = (totalOnTime / 3600).toFixed(2);
+        const totalOffHours = (totalOffTime / 3600).toFixed(2);
+
+        const cyclesPerMinute = (60 / cycleTotalTime).toFixed(2);
+        const cyclesPerHour = Math.floor(3600 / cycleTotalTime);
+        const cyclesPerDay = Math.floor(86400 / cycleTotalTime);
+
+        // 格式化时间
+        let timeFormatted;
+        if (totalTestTimeDays >= 1) {
+            const days = Math.floor(totalTestTimeDays);
+            const hours = Math.floor((totalTestTimeDays - days) * 24);
+            const minutes = Math.floor(((totalTestTimeDays - days) * 24 - hours) * 60);
+            timeFormatted = `${days}天 ${hours}小时 ${minutes}分钟`;
+        } else if (totalTestTimeHours >= 1) {
+            const hours = Math.floor(totalTestTimeHours);
+            const minutes = Math.floor((totalTestTimeHours - hours) * 60);
+            timeFormatted = `${hours}小时 ${minutes}分钟`;
+        } else {
+            timeFormatted = `${Math.floor(totalTestTimeMinutes)}分钟`;
+        }
+
+        // 计算结束时间
+        const now = new Date();
+        const endTime = new Date(now.getTime() + totalTestTimeSeconds * 1000);
+        const weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+        const endTimeFormatted = `${endTime.getFullYear()}-${String(endTime.getMonth() + 1).padStart(2, '0')}-${String(endTime.getDate()).padStart(2, '0')} (${weekdays[endTime.getDay()]}) ${String(endTime.getHours()).padStart(2, '0')}:${String(endTime.getMinutes()).padStart(2, '0')}`;
+
+        // 显示结果
+        const resultDiv = document.getElementById('result');
+        resultDiv.className = 'result-box show';
+        resultDiv.innerHTML = `
+            <div class="result-title">📊 测试时间分析结果</div>
+
+            <div class="summary-cards">
+                <div class="summary-card">
+                    <h4>ON时间</h4>
+                    <div class="value">${tOn.toFixed(1)}</div>
+                    <div class="unit">秒/次</div>
+                </div>
+                <div class="summary-card">
+                    <h4>OFF时间</h4>
+                    <div class="value">${tOff.toFixed(1)}</div>
+                    <div class="unit">秒/次</div>
+                </div>
+                <div class="summary-card">
+                    <h4>单次循环</h4>
+                    <div class="value">${cycleTotalTime.toFixed(1)}</div>
+                    <div class="unit">秒</div>
+                </div>
+            </div>
+
+            <div class="big-highlight">
+                <h3>测试总次数</h3>
+                <div class="value">${cycles.toLocaleString()}</div>
+                <div class="unit" style="color: #92400e; margin-top: 5px;">次完整循环</div>
+            </div>
+
+            <div class="big-highlight">
+                <h3>预计总时长</h3>
+                <div class="value">${timeFormatted}</div>
+            </div>
+
+            <div class="completion-box">
+                <h3>⏰ 预计完成时间</h3>
+                <div class="time">${endTimeFormatted}</div>
+                <div class="note">如果现在开始测试，将在以上时间完成</div>
+            </div>
+
+            <div class="summary-cards">
+                <div class="summary-card">
+                    <h4>总秒数</h4>
+                    <div class="value" style="font-size: 22px;">${totalTestTimeSeconds.toLocaleString()}</div>
+                    <div class="unit">秒</div>
+                </div>
+                <div class="summary-card">
+                    <h4>总小时</h4>
+                    <div class="value" style="font-size: 22px;">${totalTestTimeHours.toFixed(2)}</div>
+                    <div class="unit">小时</div>
+                </div>
+                <div class="summary-card">
+                    <h4>总天数</h4>
+                    <div class="value" style="font-size: 22px;">${totalTestTimeDays.toFixed(2)}</div>
+                    <div class="unit">天</div>
+                </div>
+            </div>
+
+            <div class="result-grid">
+                <div class="result-card on-card">
+                    <h4>累计通电时间</h4>
+                    <span class="value">${totalOnHours}</span>
+                    <span class="unit">小时</span>
+                    <div class="detail">
+                        = ${totalOnTime.toLocaleString()} 秒<br>
+                        ${cycles.toLocaleString()} 次 × ${tOn} 秒
+                    </div>
+                </div>
+
+                <div class="result-card off-card">
+                    <h4>累计断电时间</h4>
+                    <span class="value">${totalOffHours}</span>
+                    <span class="unit">小时</span>
+                    <div class="detail">
+                        = ${totalOffTime.toLocaleString()} 秒<br>
+                        ${cycles.toLocaleString()} 次 × ${tOff} 秒
+                    </div>
+                </div>
+            </div>
+
+            <h3 style="text-align: center; color: #374151; margin: 25px 0 15px 0; font-size: 16px;">📈 测试频率统计</h3>
+            <div class="frequency-grid">
+                <div class="frequency-card">
+                    <h4>每分钟</h4>
+                    <div class="value">${cyclesPerMinute}</div>
+                    <div class="unit">次</div>
+                </div>
+                <div class="frequency-card">
+                    <h4>每小时</h4>
+                    <div class="value">${cyclesPerHour}</div>
+                    <div class="unit">次</div>
+                </div>
+                <div class="frequency-card">
+                    <h4>每天</h4>
+                    <div class="value">${cyclesPerDay.toLocaleString()}</div>
+                    <div class="unit">次</div>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <h4>📐 计算公式</h4>
+                <p>• 单次循环时间 = ${tOn}秒 + ${tOff}秒 = ${cycleTotalTime}秒</p>
+                <p>• 测试总时间 = ${cycleTotalTime}秒 × ${cycles.toLocaleString()}次 = ${timeFormatted}</p>
+                <p>• 累计通电时间 = ${tOn}秒 × ${cycles.toLocaleString()}次 = ${totalOnHours}小时</p>
+                <p>• 累计断电时间 = ${tOff}秒 × ${cycles.toLocaleString()}次 = ${totalOffHours}小时</p>
+            </div>
+        `;
+    }
+</script>
+```
+
+</body>
+</html>
